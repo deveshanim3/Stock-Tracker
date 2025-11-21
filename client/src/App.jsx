@@ -1,7 +1,19 @@
-import React from 'react'
-import Login from './components/Login'
-
+import { Outlet } from 'react-router-dom'
+import { refreshAccessToken } from './services/authService';
+import { useState,useEffect } from 'react';
 const App = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const data = await refreshAccessToken();
+      if (data) setUser(data.user); 
+      setLoading(false);
+    };
+    initializeAuth();
+  }, []);
+
   return (
     <div>
       <video
@@ -17,7 +29,13 @@ const App = () => {
         />
         Your browser does not support the video tag.
       </video>
-      <Login/>
+      {
+        loading?
+        <div>Loading</div>
+        :
+        <Outlet/>
+
+      }
     </div>
   )
 }

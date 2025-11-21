@@ -1,6 +1,40 @@
-import React from 'react'
-
+import React, { useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
 const Signup = () => {
+  const [email,setEmail]=useState('');
+  const [password,setPassword]=useState('');
+  const [message, setMessage] = useState('');
+  const navigate=useNavigate()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/auth/register",
+        {
+          email,password,
+        },{
+          withCredentials:true
+        }
+      );
+      const data=res.data
+      setMessage("Signup successful!");
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("email",data.user.email)
+      navigate('/dashboard')
+      console.log("Success:", res.data);
+
+    } catch (error) {
+      if (error.response) {
+        setMessage(error.response.data.message || "Signup failed");
+        console.log(error);
+        
+      } else {
+        setMessage("Server error");
+      }
+    }
+  };
   return (
     <div className="relative w-full h-screen overflow-hidden">
       
@@ -11,15 +45,16 @@ const Signup = () => {
           
           {/* Header */}
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-green-400 tracking-wider">TradeFlow</h2>
+            <h2 className="text-3xl font-bold text-green-400 ">TradeFlow</h2>
             <p className="text-gray-400 text-sm mt-2">Access the global markets</p>
           </div>
-
           {/* Form */}
           <form className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
               <input
+                value={email}
+                onChange={(e)=>setEmail(e.target.value)}
                 type="email"
                 className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition duration-200 placeholder-gray-500"
                 placeholder="trader@example.com"
@@ -29,22 +64,17 @@ const Signup = () => {
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Password</label>
               <input
+                value={password}
+                onChange={(e)=>setPassword(e.target.value)}
                 type="password"
                 className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition duration-200 placeholder-gray-500"
                 placeholder="••••••••"
               />
             </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 rounded bg-gray-700 border-gray-600 text-green-500 focus:ring-green-500" />
-                <span className="ml-2 text-gray-400">Remember me</span>
-              </label>
-              
-            </div>
-
+            
             <button
-              type="button"
+              type='submit'
+              onClick={handleSubmit}
               className="w-full py-3 bg-linear-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold rounded-lg shadow-lg transform transition hover:-translate-y-0.5 duration-200"
             >
               Signup
@@ -52,7 +82,7 @@ const Signup = () => {
           </form>
 
           <p className="mt-8 text-center text-gray-400 text-sm">
-            Already have an account? <a href="#" className="text-green-400 hover:underline">Login</a>
+            Already have an account? <span onClick={()=>navigate('/')}className="text-green-400 hover:underline cursor-pointer">Login</span>
           </p>
         </div>
       </div>
