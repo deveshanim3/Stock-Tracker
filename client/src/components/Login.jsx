@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import {useNavigate} from 'react-router-dom'
+import React, { useState,useEffect } from 'react';
+import {useNavigate,useOutletContext} from 'react-router-dom'
 import axios from 'axios';
 const Login = () => {
   const [email,setEmail]=useState('')
   const [password,setPassword]=useState('')
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
   const navigate=useNavigate()
+
 
  const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +16,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:3000/auth/login',
+        '/auth/login',
         { email, password },
         { withCredentials: true }
       );
@@ -59,7 +59,7 @@ const Login = () => {
           </div>
 
           {/* Form */}
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
               <input
@@ -90,7 +90,6 @@ const Login = () => {
 
             <button
               type="submit"
-              onClick={handleSubmit}
               className="w-full py-3 bg-linear-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold rounded-lg shadow-lg transform transition hover:-translate-y-0.5 duration-200"
             >
               Enter Market

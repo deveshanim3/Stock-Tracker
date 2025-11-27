@@ -1,19 +1,29 @@
 import { Outlet } from 'react-router-dom'
-import { refreshAccessToken } from './services/authService';
 import { useState,useEffect } from 'react';
+import axios from 'axios';
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = 'http://localhost:3000';
 const App = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // const [user, setUser] = useState(null);
+  // const [checkingAuth, setCheckingAuth] = useState(true);
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      const data = await refreshAccessToken();
-      if (data) setUser(data.user); 
-      setLoading(false);
-    };
-    initializeAuth();
-  }, []);
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     try {
+  //       const res = await axios.get('/auth/me');
+  //       setUser(res.data.user);           
+  //     } catch (err) {
+  //       setUser(null);                     
+  //     } finally {
+  //       setCheckingAuth(false);
+  //     }
+  //   };
 
+  //   // checkAuth();
+  // }, []);
+// if (checkingAuth) {
+//   return <div className="text-white">Checking session...</div>;
+// }
   return (
     <div>
       <video
@@ -29,13 +39,7 @@ const App = () => {
         />
         Your browser does not support the video tag.
       </video>
-      {
-        loading?
-        <div>Loading</div>
-        :
-        <Outlet/>
-
-      }
+      <Outlet/>     
     </div>
   )
 }

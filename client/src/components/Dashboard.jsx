@@ -1,6 +1,7 @@
 import axios from 'axios'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import Stock from './Stock'
 
 const Dashboard = () => {
   const navigate=useNavigate()
@@ -8,25 +9,27 @@ const Dashboard = () => {
    const handleLogout = async () => {
     try {
       await axios.post(
-        'http://localhost:3000/auth/logout',
+        '/auth/logout',
         {},
         { withCredentials: true } 
-      );
-
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('email');
+      );  
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('email')
       navigate('/');
     } catch (err) {
       console.error('Logout failed:', err);
     }
   };
   return (
-    <div className='flex items-center justify-between bg-linear-to-r from-blue-300 to-blue-800'>
-      Dashboard
+    <>
+    <div className='flex items-center justify-evenly  bg-linear-to-r from-blue-300 to-blue-800'>
+      <p>Dashboard</p>
       <h2>Welcome {name}!</h2>
       <button onClick={handleLogout} className='cursor-pointer p-4 bg-blue-550' >Logout</button>
+    </div>      
+    <Stock/>
+    </>
 
-    </div>
   )
 }
 
