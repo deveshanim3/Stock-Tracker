@@ -29,6 +29,7 @@ app.get('/health',(req,res)=>{
 })
 
 app.use('/auth',authRoutes);
+
 app.listen(process.env.PORT||3000,()=>{
     console.log(`Server is running on 3000 \nhttp://localhost:${process.env.PORT}`);
     

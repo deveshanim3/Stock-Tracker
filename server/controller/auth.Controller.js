@@ -34,13 +34,18 @@ const register=async(req,res)=>{
 
         await user.save()
 
-         res.cookie('refreshToken',refreshToken,{
-            httpOnly:true,
-            maxAge: 7 * 24 * 60 * 60 * 1000 
-        })
-        
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite:none,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/',
+        });
+
+
         res.status(201).json({ 
         message: 'User registered successfully',
+        accessToken,
         user: { id: user._id, email: user.email }
         });
         
@@ -73,10 +78,10 @@ const login=async(req,res)=>{
         if (!isValidPassword) {
         return res.status(401).json({ message: 'Invalid credentials' });
         }
-        console.log("Login attempt:", email, password);
-        console.log("User found:", userExists);
-        console.log("Stored password:", userExists?.password);
-        console.log("Password match:", isValidPassword);
+        // console.log("Login attempt:", email, password);
+        // console.log("User found:", userExists);
+        // console.log("Stored password:", userExists?.password);
+        // console.log("Password match:", isValidPassword);
 
         //generate token
         const accessToken=generateAcessToken(userExists._id)
@@ -84,15 +89,18 @@ const login=async(req,res)=>{
 
         userExists.refreshToken=refreshToken;
         await userExists.save()
-
-        res.cookie('refreshToken',refreshToken,{
-            httpOnly:true,
-            maxAge: 7 * 24 * 60 * 60 * 1000 
+        console.log("Generated Access Token:", accessToken);
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/',
         })
 
-        res.json({
+
+        res.json({accessToken,
         message: 'Login successful',
-        accessToken,
         user: { 
         id: userExists._id, 
         email: userExists.email 
@@ -123,9 +131,8 @@ const refreshToken=async(req,res)=>{
         }
         const accessToken=generateAcessToken(user._id)
 
-        res.json({
-            accessToken,
-            user:{
+        res.json({accessToken,
+            user:{ 
                 id:user._id,
                 email:user.email
             }
@@ -140,17 +147,22 @@ const refreshToken=async(req,res)=>{
 const logout = async (req, res) => {
   try {
     const { refreshToken } = req.cookies;
-
+    //console.log(refreshToken)
     if (refreshToken) {
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN);
+    //   console.log(decoded.userId)
       await User.findByIdAndUpdate(decoded.userId, { refreshToken: null });
     }
 
-    res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken',{ path: "/" });
+
     res.json({ message: 'Logout successful' });
+    console.log("Logout success")
+
   } catch (error) {
-    console.error('Logout error:', error);
-    res.clearCookie('refreshToken');
+
+    console.log('Logout error:', error);
+    res.clearCookie('refreshToken',{ path: "/" });
     res.json({ message: 'Logout successful' });
   }
 };

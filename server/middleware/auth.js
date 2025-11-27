@@ -1,20 +1,19 @@
 const jwt=require('jsonwebtoken')
-const secretKey=process.env.secretKey||'Devesh'
 
-const authenticationToken =(req,res,next)=>{
-    const authHeader=req.headers['authorization']
-    const token=authHeader && authHeader.split(' ')[1]
+const auth = (req, res, next) => {
+  const token = req.cookies.accessToken;
 
-    if(!token){
-        return res.status(401).josn({message: 'Access token required'})
-    }
+  if (!token) {
+    return res.status(401).json({ message: 'Not authenticated' });
+  }
 
-    jwt.verify(token,secretKey,(err,decoded)=>{
-        if(err){
-            return res.status(403).json({message: 'Invalid or expired access token'})
-        }
-        req.userId=decoded.userId
-        next()
-    })
-}
-module.exports={authenticationToken}
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    req.userId = decoded._id;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
+};
+
+module.exports={auth}
