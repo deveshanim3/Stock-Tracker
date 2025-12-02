@@ -42,6 +42,13 @@ const register=async(req,res)=>{
             path: '/',
         });
 
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            maxAge: 15 * 60 * 1000, // 15 minutes
+            path: '/',
+        });
 
         res.status(201).json({ 
         message: 'User registered successfully',
@@ -97,7 +104,13 @@ const login=async(req,res)=>{
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/',
         })
-
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            maxAge: 15 * 60 * 1000,
+            path: '/',
+        });
 
         res.json({accessToken,
         message: 'Login successful',

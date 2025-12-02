@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Search, TrendingUp, TrendingDown, Activity, Wifi, WifiOff, AlertCircle, Clock, Loader } from 'lucide-react';
-
+import { Search, TrendingUp, TrendingDown, Activity, Wifi, WifiOff, AlertCircle, Clock, Loader, CrossIcon,Cross } from 'lucide-react';
+import Watchlist from './Watchlist';
+import Holdings from './Holding';
 export default function App() {
   // --- STATE ---
   const [symbol, setSymbol] = useState('BINANCE:BTCUSDT'); 
@@ -15,6 +16,8 @@ export default function App() {
 
   const [currentPrice, setCurrentPrice] = useState(null);
   const [priceChange, setPriceChange] = useState(0);
+
+  const [time,setTime]=useState(null)
 
   const [prevClose,setPrevClose]=useState(null);
   const [percentChange,setPercentChange]=useState(0)
@@ -47,6 +50,7 @@ export default function App() {
         setPriceChange(data.d);
         setPercentChange(data.dp)
         setPrevClose(data.pc)
+        setTime(data.t)
         prevCloseRef.current = data.pc; // Store in ref too
       }
     } catch (error) {
@@ -91,8 +95,8 @@ export default function App() {
       try {
         const response = await fetch(`https://finnhub.io/api/v1/search?q=${value}&token=${apiKey}`);
         const data = await response.json();
-        const filtered = data.result.filter(item => !item.symbol.includes('.')); 
-        setSearchResults(filtered); 
+        const filtered = data.result 
+        setSearchResults(filtered.slice(0,5)); 
       } catch (error) {
         console.error("Search error:", error);
       } finally {
@@ -102,6 +106,35 @@ export default function App() {
       setSearchResults([]);
     }
   };
+  //watchlist save
+  const saveToWatchlist = async (stock) => {
+  try {
+    const res = await fetch("http://localhost:3000/watch/al", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        symbol: stock.symbol,
+        description: stock.description,
+        displaySymbol: stock.displaySymbol,
+        currency: stock.currency,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      console.error("Save error:", data);
+      return alert("Failed to save");
+    }
+
+    alert("Saved to watchlist ✅");
+  } catch (err) {
+    console.error("Save error:", err);
+    alert("Server error");
+  }
+};
 
   const selectSymbol = (newSymbol) => {
     // 1. Unsubscribe old
@@ -173,11 +206,7 @@ export default function App() {
                   setPercentChange(pctChange);
                 }
                 return newPrice;
-              });
-
-              
-
-              
+              });                            
               
               setStockData(prev => {
                 const newPoint = {
@@ -232,11 +261,11 @@ export default function App() {
           
           {/* LEFT COL */}
           <div className="lg:col-span-1 space-y-6">
-            
+            <Watchlist onSelectSymbol={selectSymbol}/>
             {/* Search WITH Live Dropdown */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative z-50">
               <label className="block text-sm font-semibold text-slate-700 mb-2">Search Symbol</label>
-              <div className="relative">
+              <div className="relative flex">
 
                 <input
                   type="text"
@@ -246,13 +275,13 @@ export default function App() {
                   onChange={handleInputChange}
                   disabled={!isConnected}
                 />
-                <button onClick={()=>setInputValue('')} className='cursor-pointer'>Clear</button>
+                <button onClick={()=>setInputValue('')} className='cursor-pointer ml-2 rotate-45 text-slate-400'><Cross className='  transition-transform linear 200 hover:rotate-90'/></button>
                 <Search className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
-                {isSearching && <div className="absolute right-3 top-3.5"><Loader className="w-5 h-5 animate-spin text-indigo-500" /></div>}
+                {isSearching && <div className="absolute right-3 top-3.5"><Loader className="w-5 h-5 animate-spin text-indigo-500 right-5" /></div>}
                 
                 {/* Search Results Dropdown */}
                 {inputValue && searchResults.length > 0 && (
-                  <div className="absolute w-full mt-2 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden max-h-60 overflow-y-auto">
+                  <div className="absolute w-full mt-15 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden max-h-60 overflow-y-auto">
                     {searchResults.map((result, index) => (
                       <div 
                         key={`${result.symbol}-${index}`} 
@@ -263,9 +292,15 @@ export default function App() {
                             <div className="font-bold text-slate-800">{result.symbol}</div>
                             <div className="text-xs text-slate-500">{result.description}</div>
                          </div>
-                         <div className="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
-                            Select
-                         </div>
+                         <button
+  onClick={(e) => {
+    e.stopPropagation();
+    saveToWatchlist(result);
+  }}
+  className="text-xs bg-yellow-100 text-yellow-700 px-3 py-1 rounded hover:bg-yellow-200"
+>
+  Save
+</button>
                          
                       </div>
                     ))}
@@ -289,6 +324,7 @@ export default function App() {
                     <span>{Math.abs(percentChange).toFixed(2)}%</span>
                   </div>
                 )}
+                
               </div>
             </div>
 
@@ -329,6 +365,7 @@ export default function App() {
                     </div>
                   )}
                 </div>
+                {/* <Holdings getLivePrice={(symbol)=>currentPrice}/> */}
              </div>
 
           </div>

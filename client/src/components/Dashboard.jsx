@@ -22,9 +22,9 @@ const Dashboard = () => {
   };
   return (
     <>
-    <div className='flex items-center justify-evenly  bg-linear-to-r from-blue-300 to-blue-800'>
-      <p>Dashboard</p>
-      <h2>Welcome {name}!</h2>
+    <div className='flex justify-end bg-linear-to-r from-blue-300 to-blue-800'>
+      
+      <h2 className='p-4'>Welcome {name}!</h2>
       <button onClick={handleLogout} className='cursor-pointer p-4 bg-blue-550' >Logout</button>
     </div>      
     <Stock/>

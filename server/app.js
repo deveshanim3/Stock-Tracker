@@ -5,6 +5,8 @@ const connectDB=require('./database/connection')
 const cookieParser = require('cookie-parser')
 const authRoutes=require('./router/auth.Route')
 const app=express()
+const watchlist=require('./router/watchlist.route')
+const holding=require('./router/holding.route')
 
 app.use(express.json())
 app.use(express.json())
@@ -29,6 +31,8 @@ app.get('/health',(req,res)=>{
 })
 
 app.use('/auth',authRoutes);
+app.use('/watch',watchlist)
+app.use('/hold',holding)
 
 app.listen(process.env.PORT||3000,()=>{
     console.log(`Server is running on 3000 \nhttp://localhost:${process.env.PORT}`);
