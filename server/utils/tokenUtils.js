@@ -1,15 +1,15 @@
 const jwt=require('jsonwebtoken')
-const generateAcessToken=(userId)=>{
+const generateAcessToken=(id)=>{
     return jwt.sign(
-        {userId},
+        { _id: id},
         process.env.SECRET_KEY,
         {expiresIn:'15m'}
     )
 }
 
-const generateRefreshToken=(userId)=>{
+const generateRefreshToken=(id)=>{
     return jwt.sign(
-        {userId},
+        { _id: id},
         process.env.REFRESH_TOKEN,
         {expiresIn:'7d'}
     )

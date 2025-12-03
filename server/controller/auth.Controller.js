@@ -36,8 +36,8 @@ const register=async(req,res)=>{
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: true,
-            sameSite:none,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/',
         });
@@ -85,10 +85,6 @@ const login=async(req,res)=>{
         if (!isValidPassword) {
         return res.status(401).json({ message: 'Invalid credentials' });
         }
-        // console.log("Login attempt:", email, password);
-        // console.log("User found:", userExists);
-        // console.log("Stored password:", userExists?.password);
-        // console.log("Password match:", isValidPassword);
 
         //generate token
         const accessToken=generateAcessToken(userExists._id)
@@ -143,6 +139,13 @@ const refreshToken=async(req,res)=>{
             return res.status(403).json({ message: 'Invalid refresh token' });
         }
         const accessToken=generateAcessToken(user._id)
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            maxAge: 15 * 60 * 1000, // 15 minutes again
+            path: '/',
+        });
 
         res.json({accessToken,
             user:{ 
@@ -163,10 +166,10 @@ const logout = async (req, res) => {
     //console.log(refreshToken)
     if (refreshToken) {
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN);
-    //   console.log(decoded.userId)
+       console.log(decoded)
       await User.findByIdAndUpdate(decoded.userId, { refreshToken: null });
     }
-
+    
     res.clearCookie('refreshToken',{ path: "/" });
 
     res.json({ message: 'Logout successful' });

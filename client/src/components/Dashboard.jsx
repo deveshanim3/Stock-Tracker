@@ -21,14 +21,22 @@ const Dashboard = () => {
     }
   };
   return (
-    <>
-    <div className='flex justify-end bg-linear-to-r from-blue-300 to-blue-800'>
+     <div className="h-screen w-screen overflow-auto flex flex-col bg-slate-950 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       
-      <h2 className='p-4'>Welcome {name}!</h2>
-      <button onClick={handleLogout} className='cursor-pointer p-4 bg-blue-550' >Logout</button>
-    </div>      
-    <Stock/>
-    </>
+      <div className="flex justify-end items-center shrink-0">
+        <button
+          onClick={handleLogout}
+          className="cursor-pointer p-2.5 m-2 rounded-2xl bg-blue-600 transition transform 200 linear hover:bg-blue-700 text-slate-50 hover:scale-110"
+        >
+        Logout
+        </button>
+      </div>
+
+      
+        <Stock />
+
+
+    </div>
 
   )
 }
