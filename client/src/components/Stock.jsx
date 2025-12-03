@@ -503,7 +503,11 @@ const Stock=()=> {
               )}
             </div>
           </div>
+          
+          <Holdings getLivePrice={(sym) => livePrices[sym]} />
+          
         </div>
+
       </div>
     </div>
   </div>

@@ -11,6 +11,8 @@ const auth = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
     req.user = { _id: decoded._id };
+    console.log(decoded);
+    
 
     next();
   } catch (err) {

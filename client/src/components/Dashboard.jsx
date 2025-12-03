@@ -5,7 +5,7 @@ import Stock from './Stock'
 
 const Dashboard = () => {
   const navigate=useNavigate()
-  const name=localStorage.getItem('email').split('@')[0]
+
    const handleLogout = async () => {
     try {
       await axios.post(
@@ -22,11 +22,23 @@ const Dashboard = () => {
   };
   return (
      <div className="h-screen w-screen overflow-auto flex flex-col bg-slate-950 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      
-      <div className="flex justify-end items-center shrink-0">
+      <div className="relative flex w-full items-center justify-center p-4">
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>S</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>T</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>O</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>C</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider mr-1.5 transition transform hover:scale-120 linear duration-200 cursor-default'>K</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>T</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>R</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>A</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>C</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>K</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>E</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>R</h1>
+  
         <button
           onClick={handleLogout}
-          className="cursor-pointer p-2.5 m-2 rounded-2xl bg-blue-600 transition transform 200 linear hover:bg-blue-700 text-slate-50 hover:scale-110"
+          className="absolute right-4 cursor-pointer rounded-2xl bg-blue-600 p-2.5 text-slate-50 transition transform hover:scale-110 hover:bg-blue-700 linear duration-200"
         >
         Logout
         </button>
