@@ -82,11 +82,11 @@ const Login = () => {
               />
             </div>
 
-            <div className="flex
+            {/* <div className="flex
             flex-row-reverse items-center  text-sm">
               
               <span className="text-green-400 transition duration-200 hover:text-green-300  hover:underline cursor-pointer">Forgot password?</span>
-            </div>
+            </div> */}
 
             <button
               type="submit"

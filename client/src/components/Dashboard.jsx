@@ -1,5 +1,4 @@
 import axios from 'axios'
-import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import Stock from './Stock'
 
@@ -23,18 +22,18 @@ const Dashboard = () => {
   return (
      <div className="h-screen w-screen overflow-auto flex flex-col bg-slate-950 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <div className="relative flex w-full items-center justify-center p-4">
-      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>S</h1>
-      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>T</h1>
-      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>O</h1>
-      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>C</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-130 linear duration-200 cursor-default'>S</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-130 linear duration-200 cursor-default'>T</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-130 linear duration-200 cursor-default'>O</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-130 linear duration-200 cursor-default'>C</h1>
       <h1 className='text-white text-2xl font-bold tracking-wider mr-1.5 transition transform hover:scale-120 linear duration-200 cursor-default'>K</h1>
-      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>T</h1>
-      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>R</h1>
-      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>A</h1>
-      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>C</h1>
-      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>K</h1>
-      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>E</h1>
-      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-120 linear duration-200 cursor-default'>R</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-130 linear duration-200 cursor-default'>T</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-130 linear duration-200 cursor-default'>R</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-130 linear duration-200 cursor-default'>A</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-130 linear duration-200 cursor-default'>C</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-130 linear duration-200 cursor-default'>K</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-130 linear duration-200 cursor-default'>E</h1>
+      <h1 className='text-white text-2xl font-bold tracking-wider transition transform hover:scale-130 linear duration-200 cursor-default'>R</h1>
   
         <button
           onClick={handleLogout}

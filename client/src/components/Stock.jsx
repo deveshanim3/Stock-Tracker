@@ -24,7 +24,7 @@ import {
 import Watchlist from './Watchlist';
 import Holdings from './Holding';
 import { authFetch } from '../utils/authFetch';
-
+const BASE_URL = import.meta.env.VITE_BASE_URL
 const Stock=()=> {
   // --- STATE ---
   const [symbol, setSymbol] = useState('BINANCE:BTCUSDT'); 
@@ -138,7 +138,7 @@ const Stock=()=> {
   // Watchlist save
   const saveToWatchlist = async (stock) => {
     try {
-      const res = await authFetch("http://localhost:3000/watch/al", {
+      const res = await authFetch(`${BASE_URL}/watch/al`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -453,7 +453,8 @@ const Stock=()=> {
         <div className="lg:col-span-2 space-y-6">
 
           <div className="bg-slate-950 p-6 rounded-2xl shadow-sm border border-slate-700 relative z-50">
-            <label className="block text-sm font-semibold text-slate-300 mb-2">Search Symbol</label>
+            <label className="inline text-sm font-semibold text-slate-300 mb-3">Search Symbol</label>
+            {/* <button onClick={()=>setSymbol('BINANCE:BTCUSDT')} className='ml-40 rounded-2xl cursor-pointer hover:bg-slate-800'>BTC</button> */}
             <div className="relative flex">
               <input
                 type="text"

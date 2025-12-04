@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { useState,useEffect } from 'react';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = 'http://localhost:3000';
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL
 const App = () => {
 ;
   return (

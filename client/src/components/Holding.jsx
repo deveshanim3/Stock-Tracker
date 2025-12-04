@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Plus, Trash2, Search } from "lucide-react";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const Holdings = ({ getLivePrice }) => {
   const [holdings, setHoldings] = useState([]);
@@ -13,62 +13,107 @@ const Holdings = ({ getLivePrice }) => {
   const [buyPrice, setBuyPrice] = useState("");
 
   const [search, setSearch] = useState("");
+  const [error, setError] = useState(null);
 
-  // ✅ Fetch Holdings
+  // ✅ FETCH HOLDINGS (SAFE)
   const fetchHoldings = async () => {
-    const res = await fetch(`${BASE_URL}/hold/hl`, {
-      credentials: "include",
-    });
-    const data = await res.json();
-    setHoldings(data);
-    setFilteredHoldings(data);
+    try {
+      setError(null);
+
+      const res = await fetch(`${BASE_URL}/hold/hl`, {
+        credentials: "include",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("Holdings fetch failed:", data);
+        setHoldings([]);
+        setFilteredHoldings([]);
+        setError(data.message || "Failed to load holdings");
+        return;
+      }
+
+      const safeData = Array.isArray(data) ? data : [];
+
+      setHoldings(safeData);
+      setFilteredHoldings(safeData);
+
+    } catch (err) {
+      console.error("Holdings network error:", err);
+      setHoldings([]);
+      setFilteredHoldings([]);
+      setError("Network error");
+    }
   };
 
   useEffect(() => {
     fetchHoldings();
   }, []);
 
-  // ✅ Search Filter (LIKE STOCK SEARCH)
+  // ✅ SEARCH FILTER (SAFE)
   useEffect(() => {
+    if (!Array.isArray(holdings)) {
+      setFilteredHoldings([]);
+      return;
+    }
+
     const filtered = holdings.filter((h) =>
-      h.symbol.toLowerCase().includes(search.toLowerCase())
+      h.symbol?.toLowerCase().includes(search.toLowerCase())
     );
+
     setFilteredHoldings(filtered);
   }, [search, holdings]);
 
-  // ✅ Add Holding
+  // ✅ ADD HOLDING
   const addHolding = async () => {
-    const res = await fetch(`${BASE_URL}/hold/ha`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        symbol,
-        quantity: Number(qty),
-        buyPrice: Number(buyPrice),
-      }),
-    });
+    try {
+      const res = await fetch(`${BASE_URL}/hold/ha`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          symbol,
+          quantity: Number(qty),
+          buyPrice: Number(buyPrice),
+        }),
+      });
 
-    if (res.ok) {
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Add failed");
+
       fetchHoldings();
       setShowModal(false);
       setSymbol("");
       setQty("");
       setBuyPrice("");
+
+    } catch (err) {
+      alert(err.message || "Failed to add holding");
     }
   };
 
-  // ✅ Delete Holding
+  // ✅ DELETE HOLDING
   const deleteHolding = async (id) => {
-    await fetch(`${BASE_URL}/hold/hd/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-    fetchHoldings();
+    try {
+      const res = await fetch(`${BASE_URL}/hold/hd/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Delete failed");
+
+      fetchHoldings();
+
+    } catch (err) {
+      alert(err.message || "Failed to delete");
+    }
   };
 
   return (
     <div className="bg-slate-950 p-6 rounded-xl shadow border border-slate-700">
+
       {/* HEADER */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-bold text-white">Holdings</h2>
@@ -92,50 +137,58 @@ const Holdings = ({ getLivePrice }) => {
         </div>
       </div>
 
-      {/* HOLDINGS LIST */}
-      {filteredHoldings.map((h) => {
-        const current = getLivePrice(h.symbol);   // ✅ LIVE PRICE
-        const profit = current
-          ? (current - h.buyPrice) * h.quantity
-          : 0;
+      {/* ✅ ERROR UI */}
+      {error && (
+        <p className="text-red-400 text-sm mb-2">
+          {error}
+        </p>
+      )}
 
-        const percent = current
-          ? ((current - h.buyPrice) / h.buyPrice) * 100
-          : 0;
+      {/* ✅ HOLDINGS LIST (CRASH SAFE) */}
+      {Array.isArray(filteredHoldings) &&
+        filteredHoldings.map((h) => {
+          const current = getLivePrice(h.symbol);
+          const profit = current
+            ? (current - h.buyPrice) * h.quantity
+            : 0;
 
-        return (
-          <div
-            key={h._id}
-            className="flex justify-between items-center p-2 border-b border-slate-700"
-          >
-            <div>
-              <b className="text-white">{h.symbol}</b>
+          const percent = current
+            ? ((current - h.buyPrice) / h.buyPrice) * 100
+            : 0;
 
-              <div className="text-xs text-slate-400">
-                Qty: {h.quantity} | Buy: ${h.buyPrice}
-              </div>
-
-              <div className="text-xs text-slate-500">
-                Live: {current ? `$${current.toFixed(2)}` : "--"}
-              </div>
-            </div>
-
+          return (
             <div
-              className={`text-sm font-semibold ${
-                profit >= 0 ? "text-green-400" : "text-red-400"
-              }`}
+              key={h._id}
+              className="flex justify-between items-center p-2 border-b border-slate-700"
             >
-              ${profit.toFixed(2)} ({percent.toFixed(2)}%)
-            </div>
+              <div>
+                <b className="text-white">{h.symbol}</b>
 
-            <Trash2
-              size={16}
-              className="cursor-pointer text-red-400 hover:text-red-300"
-              onClick={() => deleteHolding(h._id)}
-            />
-          </div>
-        );
-      })}
+                <div className="text-xs text-slate-400">
+                  Qty: {h.quantity} | Buy: ${h.buyPrice}
+                </div>
+
+                <div className="text-xs text-slate-500">
+                  Live: {current ? `$${current.toFixed(2)}` : "--"}
+                </div>
+              </div>
+
+              <div
+                className={`text-sm font-semibold ${
+                  profit >= 0 ? "text-green-400" : "text-red-400"
+                }`}
+              >
+                ${profit.toFixed(2)} ({percent.toFixed(2)}%)
+              </div>
+
+              <Trash2
+                size={16}
+                className="cursor-pointer text-red-400 hover:text-red-300"
+                onClick={() => deleteHolding(h._id)}
+              />
+            </div>
+          );
+        })}
 
       {/* ✅ ADD MODAL */}
       {showModal && (
@@ -148,6 +201,7 @@ const Holdings = ({ getLivePrice }) => {
               value={symbol}
               onChange={(e) => setSymbol(e.target.value.toUpperCase())}
               className="bg-slate-900 border border-slate-700 text-white p-2 w-full mb-2 rounded"
+              required
             />
 
             <input
@@ -156,6 +210,7 @@ const Holdings = ({ getLivePrice }) => {
               value={qty}
               onChange={(e) => setQty(e.target.value)}
               className="bg-slate-900 border border-slate-700 text-white p-2 w-full mb-2 rounded"
+              required
             />
 
             <input
@@ -164,6 +219,7 @@ const Holdings = ({ getLivePrice }) => {
               value={buyPrice}
               onChange={(e) => setBuyPrice(e.target.value)}
               className="bg-slate-900 border border-slate-700 text-white p-2 w-full mb-4 rounded"
+              required
             />
 
             <div className="flex justify-between">
@@ -183,6 +239,7 @@ const Holdings = ({ getLivePrice }) => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

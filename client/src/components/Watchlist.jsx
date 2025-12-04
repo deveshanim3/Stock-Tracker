@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Trash2, Star } from "lucide-react";
 import { authFetch } from "../utils/authFetch";
 
-const BASE_URL = "http://localhost:3000";
 
 export default function Watchlist({ onSelectSymbol,refreshKey,livePrices }) {
   const [watchlist, setWatchlist] = useState([]);
@@ -15,7 +14,7 @@ export default function Watchlist({ onSelectSymbol,refreshKey,livePrices }) {
       setLoading(true);
       setError(null);
 
-      const res = await authFetch(`${BASE_URL}/watch/wl`);
+      const res = await authFetch(`${import.meta.env.VITE_BASE_URL}/watch/wl`);
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || "Failed to load watchlist");
@@ -32,7 +31,7 @@ export default function Watchlist({ onSelectSymbol,refreshKey,livePrices }) {
 
   const deleteStock = async (id) => {
     try {
-      const res = await authFetch(`${BASE_URL}/watch/dl/${id}`, {
+      const res = await authFetch(`${import.meta.env.VITE_BASE_URL}/watch/dl/${id}`, {
         method: "DELETE",
       });
 
