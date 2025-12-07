@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Trash2, Star } from "lucide-react";
 import { authFetch } from "../utils/authFetch";
-
+import toast,{ToastBar} from "react-hot-toast";
 
 export default function Watchlist({ onSelectSymbol,refreshKey,livePrices }) {
   const [watchlist, setWatchlist] = useState([]);
@@ -17,9 +17,13 @@ export default function Watchlist({ onSelectSymbol,refreshKey,livePrices }) {
       const res = await authFetch(`${import.meta.env.VITE_BASE_URL}/watch/wl`);
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message || "Failed to load watchlist");
+      if (!res.ok) {
+        toast.error('Failed to load watchlist')
+        throw new Error(data.message);
+      }
 
       setWatchlist(Array.isArray(data) ? data : []);
+      toast.success('Watchlist fetched')
     } catch (err) {
       console.error("Watchlist fetch error:", err);
       setError(err.message || "Failed to fetch");
@@ -39,9 +43,10 @@ export default function Watchlist({ onSelectSymbol,refreshKey,livePrices }) {
       if (!res.ok) throw new Error(data.message || "Delete failed");
 
       setWatchlist((prev) => prev.filter((item) => item._id !== id));
+      toast.success("Deleted from watchlist");
     } catch (err) {
       console.error("Delete error:", err);
-      alert(err.message || "Failed to delete stock");
+      toast.error(err.message || "Failed to delete stock");
     }
   };
   useEffect(() => {
