@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import Stock from './Stock'
+import toast from 'react-hot-toast'
 
 const Dashboard = () => {
   const navigate=useNavigate()
@@ -15,6 +16,7 @@ const Dashboard = () => {
       localStorage.removeItem('accessToken')
       localStorage.removeItem('email')
       navigate('/');
+      toast.success("Logout successfully")
     } catch (err) {
       console.error('Logout failed:', err);
     }

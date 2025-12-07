@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import {useNavigate,useOutletContext} from 'react-router-dom'
 import axios from 'axios';
+import toast from 'react-hot-toast';
 const Login = () => {
   const [email,setEmail]=useState('')
   const [password,setPassword]=useState('')
@@ -27,6 +28,7 @@ const Login = () => {
       localStorage.setItem("email",data.user.email)
       localStorage.setItem("accessToken", data.accessToken);
       navigate('/dashboard');
+      toast.success("Logged in")
 
     } catch (err) {
       console.error('Login error:', err);
