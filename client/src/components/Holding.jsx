@@ -15,7 +15,7 @@ const Holdings = ({ getLivePrice }) => {
   const [search, setSearch] = useState("");
   const [error, setError] = useState(null);
 
-  // ✅ FETCH HOLDINGS (SAFE)
+  // ✅ FETCH HOLDINGS
   const fetchHoldings = async () => {
     try {
       setError(null);
@@ -27,7 +27,6 @@ const Holdings = ({ getLivePrice }) => {
       const data = await res.json();
 
       if (!res.ok) {
-        console.error("Holdings fetch failed:", data);
         setHoldings([]);
         setFilteredHoldings([]);
         setError(data.message || "Failed to load holdings");
@@ -35,12 +34,9 @@ const Holdings = ({ getLivePrice }) => {
       }
 
       const safeData = Array.isArray(data) ? data : [];
-
       setHoldings(safeData);
       setFilteredHoldings(safeData);
-
     } catch (err) {
-      console.error("Holdings network error:", err);
       setHoldings([]);
       setFilteredHoldings([]);
       setError("Network error");
@@ -51,7 +47,7 @@ const Holdings = ({ getLivePrice }) => {
     fetchHoldings();
   }, []);
 
-  // ✅ SEARCH FILTER (SAFE)
+  // ✅ SEARCH FILTER
   useEffect(() => {
     if (!Array.isArray(holdings)) {
       setFilteredHoldings([]);
@@ -87,7 +83,6 @@ const Holdings = ({ getLivePrice }) => {
       setSymbol("");
       setQty("");
       setBuyPrice("");
-
     } catch (err) {
       alert(err.message || "Failed to add holding");
     }
@@ -105,11 +100,23 @@ const Holdings = ({ getLivePrice }) => {
       if (!res.ok) throw new Error(data.message || "Delete failed");
 
       fetchHoldings();
-
     } catch (err) {
       alert(err.message || "Failed to delete");
     }
   };
+
+  // ✅ TOTAL CALCULATIONS
+  const totalInvestment = filteredHoldings.reduce(
+    (sum, h) => sum + h.buyPrice * h.quantity,
+    0
+  );
+
+  const currentInvestment = filteredHoldings.reduce((sum, h) => {
+    const live = getLivePrice(h.symbol);
+    return live ? sum + live * h.quantity : sum;
+  }, 0);
+
+  const netProfit = currentInvestment - totalInvestment;
 
   return (
     <div className="bg-slate-950 p-6 rounded-xl shadow border border-slate-700">
@@ -137,14 +144,38 @@ const Holdings = ({ getLivePrice }) => {
         </div>
       </div>
 
-      {/* ✅ ERROR UI */}
-      {error && (
-        <p className="text-red-400 text-sm mb-2">
-          {error}
-        </p>
-      )}
+      {/* ✅ TOTAL SUMMARY */}
+      <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
+        <div className="bg-slate-900 p-3 rounded border border-slate-700">
+          <p className="text-slate-400 translate-x--5">Total Investment</p>
+          <p className="text-white font-semibold">
+            ${totalInvestment.toFixed(2)}
+          </p>
+        </div>
 
-      {/* ✅ HOLDINGS LIST (CRASH SAFE) */}
+        <div className="bg-slate-900 p-3 rounded border border-slate-700">
+          <p className="text-slate-400">Current Value</p>
+          <p className="text-white font-semibold">
+            ${currentInvestment.toFixed(2)}
+          </p>
+        </div>
+
+        <div className="bg-slate-900 p-3 rounded border border-slate-700">
+          <p className="text-slate-400">Net P/L</p>
+          <p
+            className={`font-semibold ${
+              netProfit >= 0 ? "text-green-400" : "text-red-400"
+            }`}
+          >
+            ${netProfit.toFixed(2)}
+          </p>
+        </div>
+      </div>
+
+      {/* ✅ ERROR UI */}
+      {error && <p className="text-red-400 text-sm mb-2">{error}</p>}
+
+      {/* ✅ HOLDINGS LIST */}
       {Array.isArray(filteredHoldings) &&
         filteredHoldings.map((h) => {
           const current = getLivePrice(h.symbol);
@@ -201,7 +232,6 @@ const Holdings = ({ getLivePrice }) => {
               value={symbol}
               onChange={(e) => setSymbol(e.target.value.toUpperCase())}
               className="bg-slate-900 border border-slate-700 text-white p-2 w-full mb-2 rounded"
-              required
             />
 
             <input
@@ -210,7 +240,6 @@ const Holdings = ({ getLivePrice }) => {
               value={qty}
               onChange={(e) => setQty(e.target.value)}
               className="bg-slate-900 border border-slate-700 text-white p-2 w-full mb-2 rounded"
-              required
             />
 
             <input
@@ -219,7 +248,6 @@ const Holdings = ({ getLivePrice }) => {
               value={buyPrice}
               onChange={(e) => setBuyPrice(e.target.value)}
               className="bg-slate-900 border border-slate-700 text-white p-2 w-full mb-4 rounded"
-              required
             />
 
             <div className="flex justify-between">
@@ -236,10 +264,10 @@ const Holdings = ({ getLivePrice }) => {
                 Cancel
               </button>
             </div>
+
           </div>
         </div>
       )}
-
     </div>
   );
 };

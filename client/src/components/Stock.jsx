@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import {
   AreaChart,
   Area,
@@ -83,7 +84,7 @@ const Stock=()=> {
         }));
       }
     } catch (error) {
-      console.error("Error fetching quote:", error);
+     toast.error("Failed to fetch quote");
     }
   };  
 
@@ -100,7 +101,12 @@ const Stock=()=> {
 
       if (data.s === "ok") {
         const formattedData = data.t.map((timestamp, index) => ({
-          time: new Date(timestamp * 1000).toLocaleDateString(),
+          time: new Date(timestamp * 1000).toLocaleDateString([],{ 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit' 
+    }),
           fullTime: timestamp * 1000,
           price: data.c[index]
         }));
@@ -126,6 +132,7 @@ const Stock=()=> {
         const filtered = data.result;
         setSearchResults(filtered.slice(0, 5)); 
       } catch (error) {
+        toast.error("Search failed");
         console.error("Search error:", error);
       } finally {
         setIsSearching(false);
@@ -154,11 +161,12 @@ const Stock=()=> {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
-      alert("Saved to watchlist ✅");
+       toast.success("Added to watchlist");
       setWatchlistRefreshKey(prev => prev + 1);
     } catch (err) {
       console.error("Save error:", err);
-      alert(err.message || "Failed to save");
+            toast.error(err.message || "Failed to save");
+
     }
   };
 
@@ -241,7 +249,7 @@ const Stock=()=> {
               
               setStockData(prev => {
                 const newPoint = {
-                  time: new Date(lastTrade.t).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute:'2-digit' }),
+                  time: new Date(lastTrade.t).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute:'2-digit',second:'2-digit' }),
                   fullTime: lastTrade.t,
                   price: newPrice
                 };
@@ -252,6 +260,8 @@ const Stock=()=> {
           }
         } catch (err) { console.error(err); }
       });
+
+      
 
       socket.addEventListener('error', () => { 
         setIsConnected(false); 
@@ -279,30 +289,33 @@ const Stock=()=> {
     if (currentPrice >= target) {
       setHasAlertTriggered(true);
       setIsAlertActive(false);
-      alert(
-        `⏰ Price alert hit!\n${symbol} reached $${currentPrice.toFixed(2)} (target $${target.toFixed(2)})`
-      );
+       toast.success(
+        `Price Alert Hit!\n${symbol} → $${currentPrice.toFixed(2)}`,
+        { duration: 6000 }
+      )
     }
   }, [currentPrice, isAlertActive, hasAlertTriggered, alertPrice, symbol]);
 
   const handleSetAlert = () => {
     const value = parseFloat(alertPrice);
     if (currentPrice == null) {
-      alert("Wait for live price to load before setting an alert.");
+      toast.error("Wait for live price");
       return;
     }
     if (isNaN(value)) {
-      alert("Enter a valid alert price.");
+      toast.error("Enter a valid alert price");
       return;
     }
     setIsAlertActive(true);
     setHasAlertTriggered(false);
+     toast.success("Price alert set");
   };
 
   const handleClearAlert = () => {
     setIsAlertActive(false);
     setHasAlertTriggered(false);
     setAlertPrice('');
+    toast("Alert cancelled", { icon: "⛔" });
   };
 
   const isPositive = priceChange >= 0;
@@ -310,6 +323,7 @@ const Stock=()=> {
 
   return (
   <div className="min-h-screen bg-slate-900 text-slate-100 p-4 md:p-8 font-sans">
+     <Toaster position="top-right" reverseOrder={false} />
     <div className="max-w-auto space-y-6">
       
       {connectionError && (
