@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
+import {playAlertSound,playSuccessSound} from '../utils/sound';
 import {
   AreaChart,
   Area,
@@ -162,6 +163,7 @@ const Stock=()=> {
       if (!res.ok) throw new Error(data.message);
 
        toast.success("Added to watchlist");
+       playSuccessSound()
       setWatchlistRefreshKey(prev => prev + 1);
     } catch (err) {
       console.error("Save error:", err);
@@ -293,6 +295,7 @@ const Stock=()=> {
         `Price Alert Hit!\n${symbol} → $${currentPrice.toFixed(2)}`,
         { duration: 6000 }
       )
+      playAlertSound()
     }
   }, [currentPrice, isAlertActive, hasAlertTriggered, alertPrice, symbol]);
 

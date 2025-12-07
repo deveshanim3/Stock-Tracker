@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Trash2, Star } from "lucide-react";
 import { authFetch } from "../utils/authFetch";
 import toast,{ToastBar} from "react-hot-toast";
-
+import { playSuccessSound } from "../utils/sound";
 export default function Watchlist({ onSelectSymbol,refreshKey,livePrices }) {
   const [watchlist, setWatchlist] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,6 +24,7 @@ export default function Watchlist({ onSelectSymbol,refreshKey,livePrices }) {
 
       setWatchlist(Array.isArray(data) ? data : []);
       toast.success('Watchlist fetched')
+      
     } catch (err) {
       console.error("Watchlist fetch error:", err);
       setError(err.message || "Failed to fetch");
@@ -44,6 +45,7 @@ export default function Watchlist({ onSelectSymbol,refreshKey,livePrices }) {
 
       setWatchlist((prev) => prev.filter((item) => item._id !== id));
       toast.success("Deleted from watchlist");
+      playSuccessSound()
     } catch (err) {
       console.error("Delete error:", err);
       toast.error(err.message || "Failed to delete stock");
