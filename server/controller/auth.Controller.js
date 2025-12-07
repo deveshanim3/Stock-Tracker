@@ -162,24 +162,45 @@ const refreshToken=async(req,res)=>{
 //logout
 const logout = async (req, res) => {
   try {
-    const { refreshToken } = req.cookies;
-    //console.log(refreshToken)
+    const refreshToken = req.cookies?.refreshToken;
     if (refreshToken) {
-      const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN);
-       console.log(decoded)
-      await User.findByIdAndUpdate(decoded.userId, { refreshToken: null });
+      await User.findOneAndUpdate(
+        { refreshToken },
+        { refreshToken: null }
+      );
     }
-    
-    res.clearCookie('refreshToken',{ path: "/" });
-
-    res.json({ message: 'Logout successful' });
-    console.log("Logout success")
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/"
+    });
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/"
+    });
+    return res.status(200).json({ message: "Logout successful" });
 
   } catch (error) {
+    console.error("Logout error:", error);
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/"
+    });
 
-    console.log('Logout error:', error);
-    res.clearCookie('refreshToken',{ path: "/" });
-    res.json({ message: 'Logout successful' });
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/"
+    });
+
+    return res.status(200).json({ message: "Logout successful" });
   }
 };
+
 module.exports={register,login,refreshToken,logout}
