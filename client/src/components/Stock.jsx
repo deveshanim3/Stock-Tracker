@@ -458,7 +458,7 @@ const Stock=()=> {
                 <div className="flex flex-col items-center justify-center h-full text-slate-400">
                   <Activity className="w-12 h-12 mb-4 opacity-20" />
                   <p className="font-medium">
-                    {isConnected ? 'Fetching historical data...' : ''}
+                    {isConnected ? 'Market Closed' : ''}
                   </p>
                 </div>
               )}

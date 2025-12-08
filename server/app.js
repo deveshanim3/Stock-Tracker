@@ -31,5 +31,4 @@ app.use('/hold',holding)
 app.listen(process.env.PORT||3000,()=>{
     console.log(`Server is running on 3000 \nhttp://localhost:${process.env.PORT}`);
     
-    console.log(`${process.env.MONGO_URI} \n  \n ${process.env.SECRET_KEY} \n ${process.env.REFRESH_TOKEN}`) 
 })
